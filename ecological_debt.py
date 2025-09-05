@@ -31,16 +31,16 @@ def read_data_csv(csv_file,gdf_countries):
         between 1961 and 2024
    """
 
-   df   = pd.read_csv('data/Country_Trends.csv')
+   df   = pd.read_csv('data/Country_Trends2.csv')
    poly = shapely.coverage_union_all([gdf_countries['geometry']])
 
    for year in np.unique(df['year']):
       d = {'year': [year],
            'EcoFootprint': [df[(df['year'] == year) &
-                               (df['Record'] == 'EFConsTotGHA')]['Total'].iloc[0]
+                               (df['Record'] == 'EFConsPerCap')]['Total'].iloc[0]
                            ],
            'Biocapacity':  [df[(df['year'] == year) &
-                               (df['Record'] == 'BiocapTotGHA')]['Total'].iloc[0]
+                               (df['Record'] == 'BiocapPerCap')]['Total'].iloc[0]
                            ],
            'geometry': [poly]}
       gdf = geopandas.GeoDataFrame(d,crs=gdf_countries.crs)
