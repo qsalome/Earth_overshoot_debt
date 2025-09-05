@@ -5,12 +5,8 @@ import pandas as pd
 import geopandas
 import numpy as np
 from datetime import datetime,timedelta
-from calendar import isleap,month_name
+from calendar import isleap
 from tqdm import tqdm
-from itertools import product
-import lmfit
-#import fit_functions
-#from geoanalysis_functions import read_data_csv
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
