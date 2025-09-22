@@ -265,28 +265,19 @@ FIG_DIRECTORY  = NOTEBOOK_PATH / "figures"
 countries = geopandas.read_file(DATA_DIRECTORY /
          "ne_10m_admin_0_countries")
 
-files = os.listdir(DATA_DIRECTORY)
 
-for file in files:
-   if(file[-4:] != '.csv'): continue
-   if(file[0] != 'W'): continue
+country = 'World'
 
-   country = file.split('_')[0]
-   if(country == 'UnitedKingdom'):
-      country = 'United Kingdom'
+polygon = polygon_world(countries)
 
-   if(country == 'World'): polygon = polygon_world(countries)
-   else: polygon = countries[countries['NAME']=='Malta']['geometry'].values[0]
+annual_records = read_data_csv(DATA_DIRECTORY / file,
+      polygon,countries.crs)
 
-   annual_records = read_data_csv(DATA_DIRECTORY / file,
-            polygon,countries.crs)
+records_with_overshot = determine_overshoot_day(annual_records)
 
-   records_with_overshot = determine_overshoot_day(annual_records)
+records_with_debt = calculate_ecological_debt(records_with_overshot)
 
-   records_with_debt = calculate_ecological_debt(records_with_overshot)
-
-   if(country == 'World'):
-      fig = plot_cumulative_debt(records_with_debt)
-      fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt.png")
+fig = plot_cumulative_debt(records_with_debt)
+fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt.png")
 
 
