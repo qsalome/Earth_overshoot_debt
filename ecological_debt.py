@@ -329,7 +329,10 @@ for file in files:
       country = 'United Kingdom'
 
    if(country == 'World'): polygon = polygon_world(countries)
-   else: polygon = countries[countries['NAME']==country]['geometry'].values[0]
+   else:
+      # Palestine and Israel are considered as one entity in the data
+      polygon = countries[countries['SOVEREIGNT']==country].geometry
+      polygon = polygon.values[0]
 
    annual_records = read_data_csv(DATA_DIRECTORY / file,
             polygon,countries.crs)
@@ -346,6 +349,7 @@ for file in files:
    records_with_debt = calculate_global_ecological_debt(records_with_debt)
 
    d = {'Country':   [country],
+        'Continent': [countries[countries['NAME']==country]['CONTINENT']],
         'FirstYear': [records_with_debt['year'][0]],
         'LastYear':  [records_with_debt['year'].to_numpy()[-1]],
         'LastDeficitDay': [
