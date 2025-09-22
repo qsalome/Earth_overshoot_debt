@@ -1,3 +1,4 @@
+import os
 import pathlib
 import argparse
 import shapely
@@ -14,9 +15,10 @@ from matplotlib.ticker import MultipleLocator
 #--------------------------------------------------------------------
 def polygon_world(gdf_countries):
    """
-   Use the polygons of all countries to derive a polygon for all the
-   countries together. To ensure there is no overlap with the other
-   polygons, this new polygon corresponds to the oceans and seas.
+   Use the polygons and multipolygons of all countries to derive a
+   multipolygon for all the countries together. To ensure there is
+   no overlap with the other geometry shapes, this new multipolygon
+   corresponds to the oceans and seas.
    
    Parameters
    ----------
@@ -25,6 +27,7 @@ def polygon_world(gdf_countries):
 
    Returns
    -------
+   shapely.geometry.multipolygon.MultiPolygon or
    shapely.geometry.polygon.Polygon
         polygon for all the countries together ("World")
    """
@@ -35,7 +38,7 @@ def polygon_world(gdf_countries):
    return square-poly
 
 #--------------------------------------------------------------------
-def read_data_csv(csv_file,gdf_countries):
+def read_data_csv(csv_file,polygon,crs):
    """
    Read the World records between 1961 and 2024 and return the annual
    Biocapacity and Ecological Footprint.
@@ -44,8 +47,11 @@ def read_data_csv(csv_file,gdf_countries):
    ----------
    csv_file: str
          path and name of the csv file to read
-   gdf_countries: geopandas.geodataframe.GeoDataFrame
-         administrative boarders of countries with associated geometry
+   polygon: shapely.geometry.multipolygon.MultiPolygon or
+            shapely.geometry.polygon.Polygon
+         geometry shape of the country
+   crs: pyproj.crs.crs.CRS
+         CRS system of the countries polygons and multipolygons
 
    Returns
    -------
@@ -55,7 +61,6 @@ def read_data_csv(csv_file,gdf_countries):
    """
 
    df     = pd.read_csv(csv_file)
-   poly   = polygon_world(gdf_countries)
 
    for year in np.unique(df['year']):
       d = {'year': [year],
@@ -65,8 +70,8 @@ def read_data_csv(csv_file,gdf_countries):
            'Biocapacity':  [df[(df['year'] == year) &
                                (df['Record'] == 'BiocapPerCap')]['Total'].iloc[0]
                            ],
-           'geometry': [poly]}
-      gdf = geopandas.GeoDataFrame(d,crs=gdf_countries.crs)
+           'geometry': [polygon]}
+      gdf = geopandas.GeoDataFrame(d,crs=crs)
 
       try:
          final_gdf = pd.concat([final_gdf, gdf])
@@ -259,15 +264,29 @@ FIG_DIRECTORY  = NOTEBOOK_PATH / "figures"
 
 countries = geopandas.read_file(DATA_DIRECTORY /
          "ne_10m_admin_0_countries")
-annual_records = read_data_csv(DATA_DIRECTORY /
-         "World_Trends.csv",countries)
 
+files = os.listdir(DATA_DIRECTORY)
 
-records_with_overshot = determine_overshoot_day(annual_records)
+for file in files:
+   if(file[-4:] != '.csv'): continue
+   if(file[0] != 'W'): continue
 
-records_with_debt = calculate_ecological_debt(records_with_overshot)
+   country = file.split('_')[0]
+   if(country == 'UnitedKingdom'):
+      country = 'United Kingdom'
 
-fig = plot_cumulative_debt(records_with_debt)
-fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt.png")
+   if(country == 'World'): polygon = polygon_world(countries)
+   else: polygon = countries[countries['NAME']=='Malta']['geometry'].values[0]
+
+   annual_records = read_data_csv(DATA_DIRECTORY / file,
+            polygon,countries.crs)
+
+   records_with_overshot = determine_overshoot_day(annual_records)
+
+   records_with_debt = calculate_ecological_debt(records_with_overshot)
+
+   if(country == 'World'):
+      fig = plot_cumulative_debt(records_with_debt)
+      fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt.png")
 
 
