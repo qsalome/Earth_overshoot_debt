@@ -187,9 +187,14 @@ def calculate_ecological_debt(annual_records):
    over   = annual_records['OvershootDay']-nbdays
 
 
-   first_over = np.where(over<0)[0][0]
    debt = np.zeros(len(annual_records))*float('nan')
-   for i in range(first_over,len(annual_records),1):
+   first_over = np.where(over<0)[0]
+   if(len(first_over)==0):
+      annual_records['AnnualDebt'] = debt
+      annual_records['CumulativeDebt'] = debt
+      return annual_records
+
+   for i in range(first_over[0],len(annual_records),1):
       if(over[i]<0): debt[i] = over[i]
       elif(over[i]<abs(np.sum(debt))): debt[i] = over[i]
       else: debt[i] = abs(np.sum(debt))
@@ -265,19 +270,39 @@ FIG_DIRECTORY  = NOTEBOOK_PATH / "figures"
 countries = geopandas.read_file(DATA_DIRECTORY /
          "ne_10m_admin_0_countries")
 
+files = os.listdir(DATA_DIRECTORY)
 
-country = 'World'
+for file in files:
+   if(file[-4:] != '.csv'): continue
 
-polygon = polygon_world(countries)
+   country = file.split('_')[0]
+   if(country == 'UnitedKingdom'):
+      country = 'United Kingdom'
 
-annual_records = read_data_csv(DATA_DIRECTORY / file,
-      polygon,countries.crs)
+   if(country == 'World'): polygon = polygon_world(countries)
+   else: polygon = countries[countries['NAME']==country]['geometry'].values[0]
 
-records_with_overshot = determine_overshoot_day(annual_records)
+   annual_records = read_data_csv(DATA_DIRECTORY / file,
+            polygon,countries.crs)
 
-records_with_debt = calculate_ecological_debt(records_with_overshot)
+   records_with_overshot = determine_overshoot_day(annual_records)
 
-fig = plot_cumulative_debt(records_with_debt)
-fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt.png")
+   records_with_debt = calculate_ecological_debt(records_with_overshot)
+
+   d = {'Country':   [country],
+        'FirstYear': [records_with_debt['year'][0]],
+        'LastYear':  [records_with_debt['year'].to_numpy()[-1]],
+        'CumulatedDebt': [records_with_debt['CumulativeDebt'].to_numpy()[-1]],
+        'geometry': [polygon]}
+   gdf = geopandas.GeoDataFrame(d,crs=countries.crs)
+
+   try:
+      countries_with_debt = pd.concat([countries_with_debt, gdf])
+   except:
+      countries_with_debt = gdf.copy()
+
+   if(country == 'World'):
+      fig = plot_cumulative_debt(records_with_debt)
+      fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt.png")
 
 
