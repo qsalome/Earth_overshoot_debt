@@ -12,6 +12,29 @@ from matplotlib.ticker import MultipleLocator
 
 
 #--------------------------------------------------------------------
+def polygon_world(gdf_countries):
+   """
+   Use the polygons of all countries to derive a polygon for all the
+   countries together. To ensure there is no overlap with the other
+   polygons, this new polygon corresponds to the oceans and seas.
+   
+   Parameters
+   ----------
+   gdf_countries: geopandas.geodataframe.GeoDataFrame
+         administrative boarders of countries with associated geometry
+
+   Returns
+   -------
+   shapely.geometry.polygon.Polygon
+        polygon for all the countries together ("World")
+   """
+
+   poly   = shapely.coverage_union_all([gdf_countries['geometry']])
+   square = shapely.geometry.Polygon([(-180,-90),(-180,90),(180,90),(180,-90)])
+
+   return square-poly
+
+#--------------------------------------------------------------------
 def read_data_csv(csv_file,gdf_countries):
    """
    Read the World records between 1961 and 2024 and return the annual
@@ -32,9 +55,7 @@ def read_data_csv(csv_file,gdf_countries):
    """
 
    df     = pd.read_csv(csv_file)
-   poly   = shapely.coverage_union_all([gdf_countries['geometry']])
-   square = shapely.geometry.Polygon([(-180,-90),(-180,90),(180,90),(180,-90)])
-   poly   = square-poly
+   poly   = polygon_world(gdf_countries)
 
    for year in np.unique(df['year']):
       d = {'year': [year],
