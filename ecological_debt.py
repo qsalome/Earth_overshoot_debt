@@ -31,8 +31,10 @@ def read_data_csv(csv_file,gdf_countries):
         between 1961 and 2024
    """
 
-   df   = pd.read_csv('data/Country_Trends2.csv')
-   poly = shapely.coverage_union_all([gdf_countries['geometry']])
+   df     = pd.read_csv(csv_file)
+   poly   = shapely.coverage_union_all([gdf_countries['geometry']])
+   square = shapely.geometry.Polygon([(-180,-90),(-180,90),(180,90),(180,-90)])
+   poly   = square-poly
 
    for year in np.unique(df['year']):
       d = {'year': [year],
@@ -59,6 +61,47 @@ def determine_overshoot_day(annual_records):
    """
    Determine the annual overshoot day, based on the Biocapacity and
    Ecological Footprint.
+   
+   Parameters
+   ----------
+   geopandas.geodataframe.GeoDataFrame
+        annual records of the Biocapacity and the Ecological Footprint
+
+   Returns
+   -------
+   geopandas.geodataframe.GeoDataFrame
+        annual records, with an additional column containing the Overshoot Day
+   """
+   biocap = annual_records['Biocapacity'].to_numpy()
+   ecofoot = annual_records['EcoFootprint'].to_numpy()
+
+   nbdays = np.array([366 if isleap(year) else 365
+                  for year in annual_records['year']])
+   overshoot_day = nbdays*biocap/ecofoot
+   annual_records['OvershootDay'] = overshoot_day
+
+   formatted_overshoot = np.array([])
+   for i in range(len(annual_records)):
+      year = annual_records["year"][i]
+      overshoot_day = annual_records['OvershootDay'][i]
+
+      if(overshoot_day>nbdays[i]):
+         date = 'None'
+      else:
+         date = datetime.strptime(f"{year}-{int(overshoot_day)}","%Y-%j")
+         date = date.isoformat()[:10]
+
+      formatted_overshoot = np.append(formatted_overshoot,date)
+
+   annual_records['OvershootDayFormatted'] = formatted_overshoot
+
+   return annual_records
+
+#--------------------------------------------------------------------
+def determine_country_overshoot_day(country_records,world_records):
+   """
+   Determine the annual overshoot day of a country, based on the Biocapacity
+   and Ecological Footprint.
    
    Parameters
    ----------
@@ -196,7 +239,7 @@ FIG_DIRECTORY  = NOTEBOOK_PATH / "figures"
 countries = geopandas.read_file(DATA_DIRECTORY /
          "ne_10m_admin_0_countries")
 annual_records = read_data_csv(DATA_DIRECTORY /
-         "Country_Trends.csv",countries)
+         "World_Trends.csv",countries)
 
 
 records_with_overshot = determine_overshoot_day(annual_records)
