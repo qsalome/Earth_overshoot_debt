@@ -1,4 +1,5 @@
 import os
+from tqdm import tqdm
 import pathlib
 import argparse
 import shapely
@@ -323,12 +324,17 @@ files = os.listdir(DATA_DIRECTORY)
 files = [f for f in files if f[-4:] == '.csv']
 files = np.flip(np.sort(files))
 
-for file in files:
+for file in tqdm(files):
    country = file.split('_')[0]
    if(country == 'UnitedKingdom'):
       country = 'United Kingdom'
+   elif(country == 'CzechRepublic'):
+      country = 'Czech Republic'
 
    if(country == 'World'): polygon = polygon_world(countries)
+   elif(country == 'Czech Republic'):
+      polygon = countries[countries['SOVEREIGNT']=='Czechia'].geometry
+      polygon = polygon.values[0]
    else:
       # Palestine and Israel are considered as one entity in the data
       polygon = countries[countries['SOVEREIGNT']==country].geometry
@@ -374,6 +380,6 @@ for file in files:
       fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt.png")
 
 countries_with_debt.to_file(DATA_DIRECTORY /
-      "Local_and_global_ecological_debt_countries.gpkg")
+         "Local_and_global_ecological_debt_countries.gpkg")
 
 
