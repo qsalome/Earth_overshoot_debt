@@ -331,6 +331,13 @@ for file in tqdm(files):
    elif(country == 'CzechRepublic'):
       country = 'Czech Republic'
 
+   if(country == 'World'):
+      continent = 'World'
+   elif(country == 'Czech Republic'):
+      continent = countries[countries['NAME']=='Czechia']['CONTINENT'].values[0]
+   else:
+      continent = countries[countries['NAME']==country]['CONTINENT'].values[0]
+
    if(country == 'World'): polygon = polygon_world(countries)
    elif(country == 'Czech Republic'):
       polygon = countries[countries['SOVEREIGNT']=='Czechia'].geometry
@@ -355,7 +362,7 @@ for file in tqdm(files):
    records_with_debt = calculate_global_ecological_debt(records_with_debt)
 
    d = {'Country':   [country],
-        'Continent': [countries[countries['NAME']==country]['CONTINENT']],
+        'Continent': [continent],
         'FirstYear': [records_with_debt['year'][0]],
         'LastYear':  [records_with_debt['year'].to_numpy()[-1]],
         'LastDeficitDay': [
