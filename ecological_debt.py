@@ -341,11 +341,17 @@ for file in tqdm(files):
    if(country == 'World'): polygon = polygon_world(countries)
    elif(country == 'Czech Republic'):
       polygon = countries[countries['SOVEREIGNT']=='Czechia'].geometry
-      polygon = polygon.values[0]
+      try:
+         polygon = shapely.coverage_union_all(polygon)
+      except:
+         polygon = polygon.values
    else:
       # Palestine and Israel are considered as one entity in the data
       polygon = countries[countries['SOVEREIGNT']==country].geometry
-      polygon = polygon.values[0]
+      try:
+         polygon = shapely.coverage_union_all(polygon)
+      except:
+         polygon = polygon.values
 
    annual_records = read_data_csv(DATA_DIRECTORY / file,
             polygon,countries.crs)
