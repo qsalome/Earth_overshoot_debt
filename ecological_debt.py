@@ -55,9 +55,13 @@ def extract_country_information(infile,gdf_countries):
 
    Returns
    -------
-   shapely.geometry.multipolygon.MultiPolygon or
-   shapely.geometry.polygon.Polygon
-        polygon for all the countries together ("World")
+   country: str
+         name of the country corresponding to the input file
+   continent: str
+         name of the continent where the main land of the country is located
+   polygon: shapely.geometry.multipolygon.MultiPolygon or
+            shapely.geometry.polygon.Polygon
+        geometry shape of the country
    """
    country = infile.split('_')[0]
 
