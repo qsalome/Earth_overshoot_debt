@@ -22,7 +22,7 @@ The project is based on Python 3.10. I recommend to use conda and the provided
 
     $ conda env create -f environment.yml
 
-## Data and method
+## Data
 
 The project uses the data of the Footprint Data Foundation, the York University
 Ecological Footprint Initiative, and the Global Footprint Network:
@@ -34,6 +34,36 @@ The geometry shape of the countries come from the 'Admin 0 - Countries' dataset
 of [Natural Earth](https://www.naturalearthdata.com/), available
 [here](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/).
 
+
+## Method
+
+The Ecological Footprint data provide the Ecological Footprint and the
+Biocapacity per person for each country. The data also provide the same quantity
+for the World population.
+Two methods are used to calculate the ecological debt of a country: the "local"
+based on the Deficit Day and the "global" debt based on the Overshoot Day.
+
+The Overshoot Day is the day when humanity's demand for ecological resources
+and services exceeds what Earth can regenerate in a year. The Overshoot Day is
+given by:
+$Nb_{days}*(biocapacity per person)/(ecological footprint per person)$
+
+For a country, the Overshoot Day can also be calculated and corresponds to the
+Overshoot Day if all humanity lived like the residents of the country. The
+Overshoot Day of a country is given by:
+$Nb_{days}*(local biocapacity per person)/(global ecological footprint per person)$
+In other world, if the residents of a country consume more per person that the 
+humanity as a whole, the Overshoot Day of this country occurs earlier that the
+World Overshoot Day.
+
+The Deficit Day is the day by which the residents of a country have used as much
+ressources from nature as the country's ecosystems regenerate in the entire
+year. The Deficit Day is given by:
+$Nb_{days}*(local biocapacity per person)/(local ecological footprint per person)$
+
+The annual "local" and "global" debts are estimated by considering the number
+of days following the country's Deficit Day and Overshoot Day, respectively.
+The total debts are the sum of the annual debts.
 
 
 ## Simple example
