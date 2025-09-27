@@ -30,13 +30,66 @@ def polygon_world(gdf_countries):
    -------
    shapely.geometry.multipolygon.MultiPolygon or
    shapely.geometry.polygon.Polygon
-        polygon for all the countries together ("World")
+        geometry shape for all the countries together ("World")
    """
 
    poly   = shapely.coverage_union_all([gdf_countries['geometry']])
    square = shapely.geometry.Polygon([(-180,-90),(-180,90),(180,90),(180,-90)])
 
    return square-poly
+
+#--------------------------------------------------------------------
+def extract_country_information(file,gdf_countries):
+   """
+   Give,
+   
+   Parameters
+   ----------
+   gdf_countries: geopandas.geodataframe.GeoDataFrame
+         administrative boarders of countries with associated geometry
+
+   Returns
+   -------
+   shapely.geometry.multipolygon.MultiPolygon or
+   shapely.geometry.polygon.Polygon
+        polygon for all the countries together ("World")
+   """
+   country = file.split('_')[0]
+
+   # Reformate the name of some coutries
+   if(country == 'UnitedKingdom'):
+      country = 'United Kingdom'
+   elif(country == 'CzechRepublic'):
+      country = 'Czech Republic'
+
+   # Determine the continent of the main land
+   if(country == 'World'):
+      continent = 'World'
+   elif(country == 'Czech Republic'):
+      continent = gdf_countries[gdf_countries['NAME']=='Czechia']['CONTINENT']
+      continent = continent.values[0]
+   else:
+      continent = gdf_countries[gdf_countries['NAME']==country]['CONTINENT']
+      continent = continent.values[0]
+
+   # Extract the geometry shape of the country
+   if(country == 'World'): polygon = polygon_world(countries)
+   elif(country == 'Czech Republic'):
+      polygon = countries[countries['SOVEREIGNT']=='Czechia'].geometry
+      try:
+         polygon = shapely.coverage_union_all(polygon)
+      except:
+         polygon = polygon.values
+   else:
+      # Palestine and Israel are considered as one entity in the
+      # Ecological Footprint data
+      polygon = countries[countries['SOVEREIGNT']==country].geometry
+      try:
+         polygon = shapely.coverage_union_all(polygon)
+      except:
+         polygon = polygon.values
+
+   return country,continent,polygon
 
 #--------------------------------------------------------------------
 def read_data_csv(csv_file,polygon,crs):
@@ -325,33 +378,7 @@ files = [f for f in files if f[-4:] == '.csv']
 files = np.flip(np.sort(files))
 
 for file in tqdm(files):
-   country = file.split('_')[0]
-   if(country == 'UnitedKingdom'):
-      country = 'United Kingdom'
-   elif(country == 'CzechRepublic'):
-      country = 'Czech Republic'
-
-   if(country == 'World'):
-      continent = 'World'
-   elif(country == 'Czech Republic'):
-      continent = countries[countries['NAME']=='Czechia']['CONTINENT'].values[0]
-   else:
-      continent = countries[countries['NAME']==country]['CONTINENT'].values[0]
-
-   if(country == 'World'): polygon = polygon_world(countries)
-   elif(country == 'Czech Republic'):
-      polygon = countries[countries['SOVEREIGNT']=='Czechia'].geometry
-      try:
-         polygon = shapely.coverage_union_all(polygon)
-      except:
-         polygon = polygon.values
-   else:
-      # Palestine and Israel are considered as one entity in the data
-      polygon = countries[countries['SOVEREIGNT']==country].geometry
-      try:
-         polygon = shapely.coverage_union_all(polygon)
-      except:
-         polygon = polygon.values
+   country,continent,polygon = extract_country_information(file,countries)
 
    annual_records = read_data_csv(DATA_DIRECTORY / file,
             polygon,countries.crs)

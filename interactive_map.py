@@ -49,8 +49,8 @@ def new_image_layer(gdf,name="",entry="",image=None):
       key_on="feature.properties.Country",
       name=name,
 
-#      bins=10,
-      bins=[0, 10, 20, 30,40,50,60],
+      bins=10,
+#      bins=[0, 10, 20, 30,40,50,60],
       fill_color="YlOrRd",
       line_weight=0.5,
       legend_name=f"{name} (years)",
