@@ -10,7 +10,10 @@ resources consumption does not reset at the end of the year. Instead, it
 accumulates in time into an "ecological debt". This project aims at calculating
 this "ecological debt", which I define here as the cumulative number of days
 after the annual Earth Overshoot Day. If one year, the Earth Overshoot Day is
-not reached, then the unused time is deducted from the debt.
+not reached, then the unused time is deducted from the debt. Note that the debt
+cannot be negative: the Earth does not appart ressources for later.
+<> The GitHub repository is
+[here](https://github.com/qsalome/Earth_overshoot_debt).
 
 ## Install
 
@@ -21,8 +24,17 @@ The project is based on Python 3.10. I recommend to use conda and the provided
 
 ## Data and method
 
-The project uses the data of the Global Footprint Network accessible with API.
-An API key can be obtained [here](https://data.footprintnetwork.org/#/api).
+The project uses the data of the Footprint Data Foundation, the York University
+Ecological Footprint Initiative, and the Global Footprint Network:
+https://data.footprintnetwork.org
+<> accessible with API.
+<> An API key can be obtained [here](https://data.footprintnetwork.org/#/api).
+
+The geometry shape of the countries come from the 'Admin 0 - Countries' dataset
+of [Natural Earth](https://www.naturalearthdata.com/), available
+[here](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/).
+
+
 
 ## Simple example
 
