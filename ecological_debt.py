@@ -88,7 +88,8 @@ def extract_country_information(infile,gdf_countries):
    else:
       # Palestine and Israel are considered as one entity in the
       # Ecological Footprint data
-      polygon = countries[countries['SOVEREIGNT']==country].geometry
+      polygon = countries[(countries['SOVEREIGNT']==country)&
+                          (countries['NAME']!='Greenland')].geometry
       try:
          polygon = shapely.coverage_union_all(polygon)
       except:
