@@ -29,6 +29,15 @@ The project is based on Python 3.10. I recommend to use conda and the provided
 The project uses the data of the Footprint Data Foundation, the York University
 Ecological Footprint Initiative, and the Global Footprint Network:
 https://data.footprintnetwork.org
+
+While the data are accessible with API, I am facing an issue to setup the API
+to read the data directly in the code. So far, the project requires to manually
+download the data into csv files from
+[here](https://data.footprintnetwork.org/#/countryTrends).\
+Warning: make sure that you selected the option `Ecological Footprint vs
+Biocapacity (gha per person)`.\
+Once I could successfully setup the API, I will push the updates in the
+repository.
 <!--
 accessible with API.
 An API key can be obtained [here](https://data.footprintnetwork.org/#/api).
@@ -76,6 +85,24 @@ The total debts are the sum of the annual debts.
 
 ## Simple example
 
+The `data` folder contains some csv files as an example. Additional csv files
+can be added to the folder, the code will take those files into account.
+To compile the data and calculate the "ecological debts":
+
+    $ python ecological_debt.py
+
+![image](figures/Evolution_ecological_debt.png)
+
+The file `data/Local_and_global_ecological_debt_countries.gpkg` compiles the
+Overshoot Day, Deficit Day, local debt and global debt for the World, the EU
+countries and the United Kindgom.
+This file can be used to create an interactive map showing the local and global
+debt of the countries since 1961.
+
+    $ python interactive_map.py
+
+The html file can be seen and explored
+[here](html/ecological_debts_countries.html)
 
 
 ## Bugs and development
