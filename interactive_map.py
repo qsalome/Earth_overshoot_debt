@@ -149,9 +149,12 @@ HTML_DIRECTORY = NOTEBOOK_PATH / "html"
 
 
 copyright  = ''
-#copyright += 'Temperature data (c) <a href="https://en.ilmatieteenlaitos.fi/">'
-#copyright += 'Finnish Meteorological Institute</a> & '
-#copyright += '<a href="https://paituli.csc.fi/download.html">Paituli</a>, '
+copyright += 'Ecological Footprint data (c) '
+copyright += '<a href="https://data.footprintnetwork.org/">'
+copyright += 'Footprint Data Foundation, York University Ecological Footprint '
+copyright += 'Initiative, and Global Footprint Network</a> & '
+copyright += 'Geometry shapes (c) <a href="https://www.naturalearthdata.com/">'
+copyright += 'Natural Earth</a> & '
 copyright += 'Map data (c) <a href="http://www.openstreetmap.org/copyright">'
 copyright += 'OpenStreetMap</a> contributors.'
 
