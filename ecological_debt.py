@@ -39,12 +39,17 @@ def polygon_world(gdf_countries):
    return square-poly
 
 #--------------------------------------------------------------------
-def extract_country_information(file,gdf_countries):
+def extract_country_information(infile,gdf_countries):
    """
-   Give,
-   
+   Given a input file, extract the name of the corresponding country,
+   the continent where the main land is located, and the geometry
+   shape for the visualisation.
+
    Parameters
    ----------
+   infile: str
+         name of the input csv file containing the Ecological Footprint data
+
    gdf_countries: geopandas.geodataframe.GeoDataFrame
          administrative boarders of countries with associated geometry
 
@@ -54,7 +59,7 @@ def extract_country_information(file,gdf_countries):
    shapely.geometry.polygon.Polygon
         polygon for all the countries together ("World")
    """
-   country = file.split('_')[0]
+   country = infile.split('_')[0]
 
    # Reformate the name of some coutries
    if(country == 'UnitedKingdom'):
