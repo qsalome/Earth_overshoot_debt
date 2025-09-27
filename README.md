@@ -12,10 +12,9 @@ this "ecological debt", which I define here as the cumulative number of days
 after the annual Earth Overshoot Day. If one year, the Earth Overshoot Day is
 not reached, then the unused time is deducted from the debt. Note that the debt
 cannot be negative: the Earth does not appart ressources for later.
-<!--
 The GitHub repository is
 [here](https://github.com/qsalome/Earth_overshoot_debt).
--->
+
 
 ## Install
 
