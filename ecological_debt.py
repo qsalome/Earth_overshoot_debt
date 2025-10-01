@@ -323,15 +323,45 @@ def calculate_global_ecological_debt(annual_records):
    return annual_records
 
 #--------------------------------------------------------------------
-def plot_cumulative_debt(annual_records):
+def calculate_debt_equivalent_date(records,country):
+   """
+   Calculate the date that corresponds to the cumulated ecological debt.
+
+   Parameters
+   ----------
+   records: geopandas.geodataframe.GeoDataFrame
+         annual records, including the accumulated ecological debt
+   country: str
+         name of the country of interest
+
+   Returns
+   -------
+   datetime.datetime
+         date associated with the current ecological debt
+   """
+   today = datetime.now()
+   current_annual_debt = today-datetime.strptime("2025-7-24","%Y-%m-%d")
+
+   entry = records[records["Country"] == country]['GlobalCumulatedDebt']
+   cumulated_debt = entry.values[0]
+   past_debt = timedelta(days = cumulated_debt)
+
+   debt = current_annual_debt+past_debt
+
+   return today+debt
+
+#--------------------------------------------------------------------
+def plot_cumulative_debt(annual_records,date):
    """
    Plot the evolution of the cumulative ecological debt.
    
    Parameters
    ----------
-   geopandas.geodataframe.GeoDataFrame
-        annual records of the Biocapacity, the Ecological Footprint,
-        the Overshoot Day, the annual and accumulated ecological debt
+   annual_records: geopandas.geodataframe.GeoDataFrame
+         annual records of the Biocapacity, the Ecological Footprint,
+         the Overshoot Day, the annual and accumulated ecological debt
+   date: datetime.datetime
+         date associated with the current ecological debt
 
    Returns
    -------
@@ -342,9 +372,11 @@ def plot_cumulative_debt(annual_records):
    cumul_debt = annual_records['GlobalCumulativeDebt'].to_numpy()/365.25
 
    fig,ax = plt.subplots(figsize=(10,7))
+   label  = f'Cumulated debt before 2025: {cumul_debt[-1]:.2f} years\n'
+   label += f'{date.isoformat()[:10]}'
    ax.bar(year,cumul_debt, width=1,facecolor="black",alpha=0.25,
                linewidth=1,edgecolor="black",
-               label='Cumulated debt before 2025: %.2f years'%(cumul_debt[-1]))
+               label=label)
    ax.legend(loc='upper left')
 
    plt.title(f"Evolution of the humanity ecological debt")
@@ -426,8 +458,19 @@ for file in tqdm(files):
       countries_with_debt = gdf.copy()
 
    if(country == 'World'):
-      fig = plot_cumulative_debt(records_with_debt)
-      fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt.png")
+      date = calculate_debt_equivalent_date(countries_with_debt,country)
+
+      fig = plot_cumulative_debt(records_with_debt,date)
+      fig.savefig(FIG_DIRECTORY / "Evolution_ecological_debt.png")
+   elif(country in ['France','Finland']):
+      date = calculate_debt_equivalent_date(countries_with_debt,country)
+
+      fig = plot_cumulative_debt(records_with_debt,date)
+      fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt_{country}.png")
+
+
+date = calculate_debt_equivalent_date(countries_with_debt,"World")
+print(date.isoformat()[:10])
 
 countries_with_debt.to_file(DATA_DIRECTORY /
          "Local_and_global_ecological_debt_countries.gpkg")
