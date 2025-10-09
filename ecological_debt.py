@@ -369,30 +369,52 @@ def plot_cumulative_debt(annual_records,date):
          Evolution of the cumulative ecological debt.
    """
    year = annual_records['year'].to_numpy()
-   cumul_debt = annual_records['GlobalCumulativeDebt'].to_numpy()/365.25
+   annual_debt = annual_records['GlobalAnnualDebt'].to_numpy()
+   cumul_debt  = annual_records['GlobalCumulativeDebt'].to_numpy()/365.25
 
-   fig,ax = plt.subplots(figsize=(10,7))
-   label  = f'Cumulated debt before 2025: {cumul_debt[-1]:.2f} years\n'
+   fig1,ax1 = plt.subplots(figsize=(10,7))
+   label  = f'Annual debt\n'
    label += f'{date.isoformat()[:10]}'
-   ax.bar(year,cumul_debt, width=1,facecolor="black",alpha=0.25,
+   ax1.bar(year,annual_debt, width=1,facecolor="black",alpha=0.25,
                linewidth=1,edgecolor="black",
                label=label)
-   ax.legend(loc='upper left')
+   ax1.legend(loc='upper left')
 
-   plt.title(f"Evolution of the humanity ecological debt")
+   plt.title(f"Humanity's annual ecological debt")
+   plt.xlabel("Year")
+   plt.ylabel("Annual ecological debt (days)")
+   plt.xlim([1961,2025])
+
+   ax1.tick_params(labelright=True,right=True,which='both')
+   ax1.xaxis.set_major_locator(MultipleLocator(10))
+   ax1.xaxis.set_minor_locator(MultipleLocator(5))
+   ax1.yaxis.set_major_locator(MultipleLocator(25))
+   ax1.yaxis.set_minor_locator(MultipleLocator(5))
+
+   fig1.tight_layout()
+
+   fig2,ax2 = plt.subplots(figsize=(10,7))
+   label  = f'Cumulated debt before 2025: {cumul_debt[-1]:.2f} years\n'
+   label += f'{date.isoformat()[:10]}'
+   ax2.bar(year,cumul_debt, width=1,facecolor="black",alpha=0.25,
+               linewidth=1,edgecolor="black",
+               label=label)
+   ax2.legend(loc='upper left')
+
+   plt.title(f"Evolution of the humanity's ecological debt")
    plt.xlabel("Year")
    plt.ylabel("Cumulated ecological debt (years)")
    plt.xlim([1961,2025])
 
-   ax.tick_params(labelright=True,right=True,which='both')
-   ax.xaxis.set_major_locator(MultipleLocator(10))
-   ax.xaxis.set_minor_locator(MultipleLocator(5))
-   ax.yaxis.set_major_locator(MultipleLocator(5))
-   ax.yaxis.set_minor_locator(MultipleLocator(1))
+   ax2.tick_params(labelright=True,right=True,which='both')
+   ax2.xaxis.set_major_locator(MultipleLocator(10))
+   ax2.xaxis.set_minor_locator(MultipleLocator(5))
+   ax2.yaxis.set_major_locator(MultipleLocator(5))
+   ax2.yaxis.set_minor_locator(MultipleLocator(1))
 
-   fig.tight_layout()
+   fig2.tight_layout()
 
-   return fig
+   return fig1,fig2
 
 #--------------------------------------------------------------------
 
@@ -460,13 +482,15 @@ for file in tqdm(files):
    if(country == 'World'):
       date = calculate_debt_equivalent_date(countries_with_debt,country)
 
-      fig = plot_cumulative_debt(records_with_debt,date)
-      fig.savefig(FIG_DIRECTORY / "Evolution_ecological_debt.png")
+      fig1,fig2 = plot_cumulative_debt(records_with_debt,date)
+      fig1.savefig(FIG_DIRECTORY / "Annual_ecological_debt.png")
+      fig2.savefig(FIG_DIRECTORY / "Evolution_ecological_debt.png")
    elif(country in ['France','Finland']):
       date = calculate_debt_equivalent_date(countries_with_debt,country)
 
-      fig = plot_cumulative_debt(records_with_debt,date)
-      fig.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt_{country}.png")
+      fig1,fig2 = plot_cumulative_debt(records_with_debt,date)
+      fig1.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt_{country}.png")
+      fig2.savefig(FIG_DIRECTORY / f"Annual_ecological_debt_{country}.png")
 
 
 date = calculate_debt_equivalent_date(countries_with_debt,"World")
