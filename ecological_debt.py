@@ -348,7 +348,7 @@ def calculate_debt_equivalent_date(records,country):
 
    debt = current_annual_debt+past_debt
 
-   return today+debt
+   return today+debt,debt
 
 #--------------------------------------------------------------------
 def plot_cumulative_debt(annual_records,date):
@@ -480,21 +480,23 @@ for file in tqdm(files):
       countries_with_debt = gdf.copy()
 
    if(country == 'World'):
-      date = calculate_debt_equivalent_date(countries_with_debt,country)
+      date,debt = calculate_debt_equivalent_date(countries_with_debt,country)
 
       fig1,fig2 = plot_cumulative_debt(records_with_debt,date)
       fig1.savefig(FIG_DIRECTORY / "Annual_ecological_debt.png")
       fig2.savefig(FIG_DIRECTORY / "Evolution_ecological_debt.png")
    elif(country in ['France','Finland']):
-      date = calculate_debt_equivalent_date(countries_with_debt,country)
+      date,debt = calculate_debt_equivalent_date(countries_with_debt,country)
 
       fig1,fig2 = plot_cumulative_debt(records_with_debt,date)
       fig1.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt_{country}.png")
       fig2.savefig(FIG_DIRECTORY / f"Annual_ecological_debt_{country}.png")
 
 
-date = calculate_debt_equivalent_date(countries_with_debt,"World")
+date,debt = calculate_debt_equivalent_date(countries_with_debt,
+                                       "World")
 print(date.isoformat()[:10])
+print(datetime.fromordinal(debt.days).isoformat()[:10])
 
 countries_with_debt.to_file(DATA_DIRECTORY /
          "Local_and_global_ecological_debt_countries.gpkg")
