@@ -489,8 +489,8 @@ for file in tqdm(files):
       date,debt = calculate_debt_equivalent_date(countries_with_debt,country)
 
       fig1,fig2 = plot_cumulative_debt(records_with_debt,date)
-      fig1.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt_{country}.png")
-      fig2.savefig(FIG_DIRECTORY / f"Annual_ecological_debt_{country}.png")
+      fig1.savefig(FIG_DIRECTORY / f"Annual_ecological_debt_{country}.png")
+      fig2.savefig(FIG_DIRECTORY / f"Evolution_ecological_debt_{country}.png")
 
 
 date,debt = calculate_debt_equivalent_date(countries_with_debt,
