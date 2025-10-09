@@ -90,7 +90,7 @@ To compile the data and calculate the "ecological debts":
 
     $ python ecological_debt.py
 
-![image](figures/Evolution_ecological_debt.png)
+![image](figures/Annual_ecological_debt.png) ![image](figures/Evolution_ecological_debt.png)
 
 The file `data/Local_and_global_ecological_debt_countries.gpkg` compiles the
 Overshoot Day, Deficit Day, local debt and global debt for the World, the EU
